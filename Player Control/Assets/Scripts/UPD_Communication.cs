@@ -13,6 +13,11 @@ public class UPD_Communication : MonoBehaviour
 
     public List<Landmark> landmarks = new List<Landmark>();
 
+    public GameObject noseObject;
+
+    private int scale = 5;
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -86,11 +91,37 @@ public class UPD_Communication : MonoBehaviour
                 for (int i = 0; i < landmarks.Count; i++)
                 {
                     Landmark landmark = landmarks[i];
-                    Debug.Log($"Landmark {i}: X={landmark.x}, Y={landmark.y}, Z={landmark.z}, Visibility={landmark.visibility}");
                 }
-                // Optionally, perform actions with the landmarks here
+                RotateHeadBasedOnPreciseAngles(noseObject.transform);
             }
         }
+    }
+    void RotateHeadBasedOnPreciseAngles(Transform headTransform)
+    {
+        if (headTransform == null || landmarks.Count < 9) return;
+
+        // Get landmarks for the nose and ears
+        Landmark nose = landmarks[0];
+        Landmark leftEar = landmarks[7];
+        Landmark rightEar = landmarks[8];
+
+        // Calculate the midpoint between the ears (used as the center reference point)
+        float earMidpointX = (leftEar.x + rightEar.x) / 2.0f;
+        float earMidpointY = (leftEar.y + rightEar.y) / 2.0f;
+
+        // Get the position of the nose
+        float noseX = nose.x;
+        float noseY = nose.y;
+
+        // Calculate horizontal rotation (Y-axis rotation) based on the X distance from nose to ear midpoint
+        float horizontalRotationAngle = Mathf.Atan2(noseX - earMidpointX, 1.0f) * Mathf.Rad2Deg * scale;
+
+        // Calculate vertical rotation (X-axis rotation) based on the Y distance from nose to ear midpoint
+        float verticalRotationAngle = Mathf.Atan2(earMidpointY - noseY, 1.0f) * Mathf.Rad2Deg * scale;
+
+        // Apply the calculated rotations to the head transform
+        Quaternion targetRotation = Quaternion.Euler(-verticalRotationAngle, -horizontalRotationAngle, 0f);
+        headTransform.rotation = Quaternion.Slerp(headTransform.rotation, targetRotation, Time.deltaTime * 5f);
     }
 
 
