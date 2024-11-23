@@ -6,6 +6,9 @@ import json
 
 def Pose_Images():
     mp_pose = mp.solutions.pose
+    mp_drawing = mp.solutions.drawing_utils
+    mp_drawing_styles = mp.solutions.drawing_styles
+    
     with mp_pose.Pose(
         min_detection_confidence=0.5,
         min_tracking_confidence=0.8) as pose:
@@ -22,10 +25,18 @@ def Pose_Images():
             image.flags.writeable = False
 
             results = pose.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
-            print(results.pose_landmarks)
-
-            # Serialize and send pose data
+            
+            image.flags.writeable = True
+            
             if results.pose_landmarks:
+                # Draw landmarks and connections on the image.
+                mp_drawing.draw_landmarks(
+                    image,
+                    results.pose_landmarks,
+                    mp_pose.POSE_CONNECTIONS,
+                    landmark_drawing_spec=mp_drawing_styles.get_default_pose_landmarks_style())
+                
+                # Serialize and send pose data
                 landmarks = []
                 for landmark in results.pose_landmarks.landmark:
                     landmarks.append({
@@ -37,12 +48,12 @@ def Pose_Images():
                 data = json.dumps({'landmarks': landmarks})
                 sock.sendto(data.encode('utf-8'), serverAddressPort)
 
-            cv2.imshow('image', image)
+            cv2.imshow('Pose Estimation', image)
 
             if cv2.waitKey(10) & 0xFF == ord('q'):
                 break
         cap.release()
-
+        cv2.destroyAllWindows()
 
 
 if __name__ == '__main__':
