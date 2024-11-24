@@ -29,7 +29,7 @@ public class UPD_Communication : MonoBehaviour
     public GameObject hipObject;
 
     private int scale = 10;
-    private float smoth = 6f;
+    private float smoth = 5f;
     Animator animator;
 
 
