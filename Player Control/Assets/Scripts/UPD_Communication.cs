@@ -14,6 +14,7 @@ public class UPD_Communication : MonoBehaviour
 
     public List<Landmark> landmarks = new List<Landmark>();
 
+    public GameObject root;
     public GameObject noseObject;
     public GameObject leftArmObject;
     public GameObject rightArmObject;
@@ -108,6 +109,7 @@ public class UPD_Communication : MonoBehaviour
                 {
                     Landmark landmark = landmarks[i];
                 }
+                MoveModelRootBasedOnHip(root.transform);
                 RotateHead(noseObject.transform);
                 RotateLeftArm(leftArmObject.transform);
                 RotateRightArm(rightArmObject.transform);
@@ -124,33 +126,83 @@ public class UPD_Communication : MonoBehaviour
             }
         }
     }
+
+    void MoveModelRootBasedOnHip(Transform rootTransform)
+    {
+        if (rootTransform == null || landmarks.Count < 23) return;
+
+        // Get landmarks for the left and right hips (points 23 and 24 in MediaPipe Pose)
+        Landmark leftHip = landmarks[23];
+        Landmark rightHip = landmarks[24];
+
+        // Calculate the midpoint between the hips (normalized space)
+        Vector3 hipMidpointNormalized = new Vector3(
+            (leftHip.x + rightHip.x) / 2.0f,
+            (leftHip.y + rightHip.y) / 2.0f,
+            (leftHip.z + rightHip.z) / 2.0f
+        );
+
+        // Assuming you want to convert this to world space, scale by some factor
+        // For example, if normalized values range from 0 to 1, you can use a scale factor for world space:
+        float scaleFactor = 2f; // Adjust this depending on your world coordinates range
+        Vector3 worldHipMidpoint = new Vector3(
+            hipMidpointNormalized.x * scaleFactor * -1,
+            hipMidpointNormalized.y * scaleFactor * -1,
+            hipMidpointNormalized.z * scaleFactor * -1
+        );
+
+        // Apply the calculated world position to the root transform
+        rootTransform.position = Vector3.Lerp(rootTransform.position, worldHipMidpoint, Time.deltaTime * 5f);  // Smooth movement
+    }
+
+
+
     void RotateHead(Transform headTransform)
     {
         if (headTransform == null || landmarks.Count < 9) return;
 
-        // Get landmarks for the nose and ears
-        Landmark nose = landmarks[0];
+        // Get landmarks for the left ear (point 7), right ear (point 8), and nose (point 0)
         Landmark leftEar = landmarks[7];
         Landmark rightEar = landmarks[8];
+        Landmark nose = landmarks[0];
 
-        // Calculate the midpoint between the ears (used as the center reference point)
-        float earMidpointX = (leftEar.x + rightEar.x) / 2.0f;
-        float earMidpointY = (leftEar.y + rightEar.y) / 2.0f;
+        // Calculate the midpoint between the ears (optional, but can be useful for other calculations)
+        Vector3 earMidpoint = new Vector3(
+            (leftEar.x + rightEar.x) / 2.0f,
+            (leftEar.y + rightEar.y) / 2.0f,
+            (leftEar.z + rightEar.z) / 2.0f
+        );
 
-        // Get the position of the nose
-        float noseX = nose.x;
-        float noseY = nose.y;
+        // Create a vector pointing from the right ear to the left ear (this defines the head's rotation direction)
+        Vector3 earLine = new Vector3(
+            leftEar.x - rightEar.x,
+            leftEar.y - rightEar.y,
+            leftEar.z - rightEar.z
+        );
+        earLine.Normalize(); // Normalize to get just the direction
 
-        // Calculate horizontal rotation (Y-axis rotation) based on the X distance from nose to ear midpoint
-        float horizontalRotationAngle = Mathf.Atan2(noseX - earMidpointX, 1.0f) * Mathf.Rad2Deg * scale;
+        // Calculate the horizontal (yaw) rotation using the X and Z components (left-right rotation)
+        float horizontalRotationAngle = Mathf.Atan2(earLine.x, earLine.z) * Mathf.Rad2Deg;
 
-        // Calculate vertical rotation (X-axis rotation) based on the Y distance from nose to ear midpoint
-        float verticalRotationAngle = Mathf.Atan2(earMidpointY - noseY, 1.0f) * Mathf.Rad2Deg * scale;
+        // **Corrected vertical rotation (pitch) calculation**:
+        // Calculate the difference in Y positions between the ear midpoint and the nose
+        float verticalDiff = earMidpoint.y - nose.y;
 
-        // Apply the calculated rotations to the head transform
-        Quaternion targetRotation = Quaternion.Euler(-verticalRotationAngle, -horizontalRotationAngle, 0f);
+        // Use the difference to calculate the pitch angle
+        // This is a more straightforward calculation for pitch, as it's simply the Y difference
+        float verticalRotationAngle = Mathf.Atan2(verticalDiff, earLine.magnitude) * Mathf.Rad2Deg * 10;
+
+        // Calculate the target rotation based on horizontal (yaw) and vertical (pitch) angles
+        Quaternion targetRotation = Quaternion.Euler(0f, horizontalRotationAngle, -verticalRotationAngle);
+
+        // Adjust the rotation to account for any initial T-pose offset (if needed)
+        Quaternion tPoseCorrection = Quaternion.Euler(-20f, -90f, 0f);  // Adjust these values as needed
+        targetRotation = targetRotation * tPoseCorrection;
+
+        // Smoothly interpolate from the current rotation to the target rotation
         headTransform.rotation = Quaternion.Slerp(headTransform.rotation, targetRotation, Time.deltaTime * smoth);
     }
+
 
     void RotateLeftArm(Transform armTransform)
     {
@@ -268,9 +320,6 @@ public class UPD_Communication : MonoBehaviour
         Landmark wrist = landmarks[15];
         Landmark indexFingerTip = landmarks[19];
 
-        // Validate visibility of the landmarks
-        if (wrist.visibility < 0.5f || indexFingerTip.visibility < 0.5f) return;
-
         // Create a vector from wrist to index finger tip
         Vector3 wristToIndex = new Vector3(
             indexFingerTip.x - wrist.x,
@@ -280,7 +329,7 @@ public class UPD_Communication : MonoBehaviour
 
         // Use an up vector from the elbow to the wrist for a better reference
         Landmark elbow = landmarks[13]; // Left elbow landmark
-        if (elbow.visibility < 0.5f) return;
+        //if (elbow.visibility < 0.5f) return;
         Vector3 elbowToWrist = new Vector3(
             wrist.x - elbow.x,
             wrist.y - elbow.y,
@@ -310,9 +359,6 @@ public class UPD_Communication : MonoBehaviour
         Landmark wrist = landmarks[16];
         Landmark indexFingerTip = landmarks[20];
 
-        // Validate visibility of the landmarks
-        if (wrist.visibility < 0.5f || indexFingerTip.visibility < 0.5f) return;
-
         // Create a vector from wrist to index finger tip
         Vector3 wristToIndex = new Vector3(
             indexFingerTip.x - wrist.x,
@@ -322,7 +368,7 @@ public class UPD_Communication : MonoBehaviour
 
         // Use an up vector from the elbow to the wrist for a better reference
         Landmark elbow = landmarks[14]; // Right elbow landmark
-        if (elbow.visibility < 0.5f) return;
+        //if (elbow.visibility < 0.5f) return;
         Vector3 elbowToWrist = new Vector3(
             wrist.x - elbow.x,
             wrist.y - elbow.y,
@@ -391,10 +437,6 @@ public class UPD_Communication : MonoBehaviour
         Landmark leftHip = landmarks[23];
         Landmark rightHip = landmarks[24];
 
-        // Validate visibility of the landmarks
-        if (leftShoulder.visibility < 0.5f || rightShoulder.visibility < 0.5f ||
-            leftHip.visibility < 0.5f || rightHip.visibility < 0.5f) return;
-
         // Calculate the centers of the shoulders and hips
         Vector3 shoulderCenter = new Vector3(
             (leftShoulder.x + rightShoulder.x) / 2.0f,
@@ -454,9 +496,6 @@ public class UPD_Communication : MonoBehaviour
         Landmark leftHip = landmarks[23];
         Landmark rightHip = landmarks[24];
 
-        // Validate visibility of the landmarks
-        if (leftHip.visibility < 0.5f || rightHip.visibility < 0.5f) return;
-
         // Calculate the midpoint between the hips
         Vector3 hipMidpoint = new Vector3(
             (leftHip.x + rightHip.x) / 2.0f,
@@ -502,9 +541,6 @@ public class UPD_Communication : MonoBehaviour
         Landmark leftHip = landmarks[23];
         Landmark rightHip = landmarks[24];
         Landmark leftKnee = landmarks[25];
-
-        // Validate visibility of the landmarks, ensuring all points are visible enough
-        if (leftHip.visibility < 0.5f || rightHip.visibility < 0.5f || leftKnee.visibility < 0.5f) return;
 
         // Create a vector for hip to knee and reverse the direction
         Vector3 hipToKnee = new Vector3(
@@ -554,9 +590,6 @@ public class UPD_Communication : MonoBehaviour
         Landmark rightHip = landmarks[24];
         Landmark leftHip = landmarks[23];
         Landmark rightKnee = landmarks[26];
-
-        // Validate visibility of the landmarks, ensuring all points are visible enough
-        if (rightHip.visibility < 0.5f || leftHip.visibility < 0.5f || rightKnee.visibility < 0.5f) return;
 
         // Create a vector for hip to knee and reverse the direction
         Vector3 hipToKnee = new Vector3(

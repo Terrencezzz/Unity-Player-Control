@@ -127,7 +127,7 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: c048bdb9208ae594fbf62e5ed1b9d2dd, type: 3}
   m_PrefabInstance: {fileID: 940632264}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &64328268
+--- !u!114 &64328271
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -140,7 +140,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   landmarks: []
-  noseObject: {fileID: 382380662}
+  root: {fileID: 64328264}
+  noseObject: {fileID: 1465046572}
   leftArmObject: {fileID: 1642225570}
   rightArmObject: {fileID: 667027586}
   leftForearmObject: {fileID: 464733899}
@@ -156,11 +157,6 @@ MonoBehaviour:
 --- !u!1 &228048600 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -7657966619581158213, guid: c048bdb9208ae594fbf62e5ed1b9d2dd, type: 3}
-  m_PrefabInstance: {fileID: 940632264}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &382380662 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: -1781356600409242780, guid: c048bdb9208ae594fbf62e5ed1b9d2dd, type: 3}
   m_PrefabInstance: {fileID: 940632264}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &382380663 stripped
@@ -333,7 +329,7 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c048bdb9208ae594fbf62e5ed1b9d2dd, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 64328268}
+      addedObject: {fileID: 64328271}
   m_SourcePrefab: {fileID: 100100000, guid: c048bdb9208ae594fbf62e5ed1b9d2dd, type: 3}
 --- !u!1 &963194225
 GameObject:
