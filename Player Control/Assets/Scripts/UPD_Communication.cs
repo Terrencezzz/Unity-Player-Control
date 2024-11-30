@@ -28,6 +28,8 @@ public class UPD_Communication : MonoBehaviour
     public GameObject waistObject;
     public GameObject waist2Object;
     public GameObject hipObject;
+    public GameObject leftLowLegObject;
+    public GameObject rightLowLegObject;
 
     private int scale = 10;
     private float smoth = 5f;
@@ -118,11 +120,12 @@ public class UPD_Communication : MonoBehaviour
                 RotateLeftWrist(leftWristObject.transform);
                 RotateRightWrist(rightWristObject.transform);
                 RotateWaist(waistObject.transform);
-                //RotateWaist(waist2Object.transform);
                 RotateChest(chestObject.transform);
                 RotateHip(hipObject.transform);
                 RotateLeftUpLeg(leftUpLeg.transform);
                 RotateRightUpLeg(rightUpLeg.transform);
+                RotateLeftLowerLeg(leftLowLegObject.transform);
+                RotateRightLowerLeg(rightLowLegObject.transform);
             }
         }
     }
@@ -627,6 +630,70 @@ public class UPD_Communication : MonoBehaviour
 
         // Smoothly interpolate the current rotation to the target rotation
         upperLegTransform.rotation = Quaternion.Slerp(upperLegTransform.rotation, targetRotation, Time.deltaTime * smoth);
+    }
+
+    void RotateLeftLowerLeg(Transform lowerLegTransform)
+    {
+        if (lowerLegTransform == null || landmarks.Count < 29) return;
+
+        // Get landmarks for the left knee (point 25) and left ankle (point 27)
+        Landmark leftKnee = landmarks[25];
+        Landmark leftAnkle = landmarks[27];
+
+        // Create a vector for knee to ankle
+        Vector3 kneeToAnkle = new Vector3(
+            leftAnkle.x - leftKnee.x,
+            leftAnkle.y - leftKnee.y,
+            leftAnkle.z - leftKnee.z
+        );
+
+        // Normalize the vector to ensure it only represents direction
+        kneeToAnkle.Normalize();
+
+        // Calculate a reference up vector for the lower leg
+        Vector3 referenceUp = Vector3.up; // You can customize this based on the model's orientation.
+
+        // Calculate the target rotation based on the knee-to-ankle direction and the up vector
+        Quaternion targetRotation = Quaternion.LookRotation(kneeToAnkle, referenceUp);
+
+        // Adjust the rotation to account for the initial T-pose offset
+        Quaternion tPoseCorrection = Quaternion.Euler(40f, 0f, 180f); // Modify as necessary for alignment
+        targetRotation = targetRotation * tPoseCorrection;
+
+        // Smoothly interpolate the current rotation to the target rotation
+        lowerLegTransform.rotation = Quaternion.Slerp(lowerLegTransform.rotation, targetRotation, Time.deltaTime * smoth);
+    }
+
+    void RotateRightLowerLeg(Transform lowerLegTransform)
+    {
+        if (lowerLegTransform == null || landmarks.Count < 29) return;
+
+        // Get landmarks for the right knee (point 26) and right ankle (point 28)
+        Landmark rightKnee = landmarks[26];
+        Landmark rightAnkle = landmarks[28];
+
+        // Create a vector for knee to ankle
+        Vector3 kneeToAnkle = new Vector3(
+            rightAnkle.x - rightKnee.x,
+            rightAnkle.y - rightKnee.y,
+            rightAnkle.z - rightKnee.z
+        );
+
+        // Normalize the vector to ensure it only represents direction
+        kneeToAnkle.Normalize();
+
+        // Calculate a reference up vector for the lower leg
+        Vector3 referenceUp = Vector3.up; // You can customize this based on the model's orientation.
+
+        // Calculate the target rotation based on the knee-to-ankle direction and the up vector
+        Quaternion targetRotation = Quaternion.LookRotation(kneeToAnkle, referenceUp);
+
+        // Adjust the rotation to account for the initial T-pose offset
+        Quaternion tPoseCorrection = Quaternion.Euler(40f, 0f, 180f); // Modify as necessary for alignment
+        targetRotation = targetRotation * tPoseCorrection;
+
+        // Smoothly interpolate the current rotation to the target rotation
+        lowerLegTransform.rotation = Quaternion.Slerp(lowerLegTransform.rotation, targetRotation, Time.deltaTime * smoth);
     }
 
 

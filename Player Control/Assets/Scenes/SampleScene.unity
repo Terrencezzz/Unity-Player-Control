@@ -154,6 +154,8 @@ MonoBehaviour:
   waistObject: {fileID: 2058846925}
   waist2Object: {fileID: 228048600}
   hipObject: {fileID: 1053116716}
+  leftLowLegObject: {fileID: 1478462989}
+  rightLowLegObject: {fileID: 1919954363}
 --- !u!1 &228048600 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -7657966619581158213, guid: c048bdb9208ae594fbf62e5ed1b9d2dd, type: 3}
@@ -417,7 +419,7 @@ Transform:
   m_GameObject: {fileID: 963194225}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 0, y: 0, z: 3}
+  m_LocalPosition: {x: -0.686, y: -0.199, z: 3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -479,9 +481,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 382380663}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1478462989 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -6170625038081293824, guid: c048bdb9208ae594fbf62e5ed1b9d2dd, type: 3}
+  m_PrefabInstance: {fileID: 940632264}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1642225570 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8817898888258712963, guid: c048bdb9208ae594fbf62e5ed1b9d2dd, type: 3}
+  m_PrefabInstance: {fileID: 940632264}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1919954363 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -4332706925441422008, guid: c048bdb9208ae594fbf62e5ed1b9d2dd, type: 3}
   m_PrefabInstance: {fileID: 940632264}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &2008783769 stripped
