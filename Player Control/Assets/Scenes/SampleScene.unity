@@ -141,7 +141,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   landmarks: []
   root: {fileID: 64328264}
-  noseObject: {fileID: 1465046572}
+  noseObject: {fileID: 2083539269}
   leftArmObject: {fileID: 1642225570}
   rightArmObject: {fileID: 667027586}
   leftForearmObject: {fileID: 464733899}
@@ -509,6 +509,11 @@ GameObject:
 --- !u!1 &2076202717 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -3086436065929644917, guid: c048bdb9208ae594fbf62e5ed1b9d2dd, type: 3}
+  m_PrefabInstance: {fileID: 940632264}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &2083539269 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -5195048882033904264, guid: c048bdb9208ae594fbf62e5ed1b9d2dd, type: 3}
   m_PrefabInstance: {fileID: 940632264}
   m_PrefabAsset: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
