@@ -55,14 +55,17 @@ def Pose_Images():
                 data = json.dumps({'type': 'pose', 'landmarks': landmarks})
                 sock.sendto(data.encode('utf-8'), serverAddressPort)
 
-            if hand_results.multi_hand_landmarks:
-                for hand_landmarks in hand_results.multi_hand_landmarks:
+            if hand_results.multi_hand_landmarks and hand_results.multi_handedness:
+                for hand_landmarks, hand_handedness in zip(hand_results.multi_hand_landmarks, hand_results.multi_handedness):
                     mp_drawing.draw_landmarks(
                         image,
                         hand_landmarks,
                         mp_hands.HAND_CONNECTIONS,
                         mp_drawing_styles.get_default_hand_landmarks_style(),
                         mp_drawing_styles.get_default_hand_connections_style())
+
+                    # Get handedness ('Left' or 'Right')
+                    handedness = hand_handedness.classification[0].label
 
                     # Serialize and send hand data
                     hand_landmarks_list = []
@@ -72,7 +75,11 @@ def Pose_Images():
                             'y': landmark.y,
                             'z': landmark.z
                         })
-                    data = json.dumps({'type': 'hand', 'hand_landmarks': hand_landmarks_list})
+                    data = json.dumps({
+                        'type': 'hand',
+                        'handedness': handedness,
+                        'hand_landmarks': hand_landmarks_list
+                    })
                     sock.sendto(data.encode('utf-8'), serverAddressPort)
 
             cv2.imshow('Pose and Hand Estimation', image)

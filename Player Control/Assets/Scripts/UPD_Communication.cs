@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading;
 using System.Collections.Generic;
 using UnityEditor.Experimental.GraphView;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 public class UPD_Communication : MonoBehaviour
 {
@@ -13,7 +15,8 @@ public class UPD_Communication : MonoBehaviour
     private bool isRunning = false;
 
     public List<Landmark> landmarks = new List<Landmark>();
-    public List<HandLandmark> handLandmarks = new List<HandLandmark>();
+    public List<HandLandmark> leftHandLandmarks = new List<HandLandmark>();
+    public List<HandLandmark> rightHandLandmarks = new List<HandLandmark>();
 
     public GameObject root;
     public GameObject noseObject;
@@ -70,15 +73,16 @@ public class UPD_Communication : MonoBehaviour
                 byte[] data = udpClient.Receive(ref remoteEndPoint);
                 string json = Encoding.UTF8.GetString(data);
 
-                // Deserialize the JSON data to determine the type
-                ReceivedData receivedData = JsonUtility.FromJson<ReceivedData>(json);
+                Debug.Log("Received JSON: " + json);
 
-                if (receivedData.type == "pose")
+                JObject jsonData = JObject.Parse(json);
+                string type = (string)jsonData["type"];
+
+                if (type == "pose")
                 {
-                    // Deserialize as PoseData
-                    PoseData poseData = JsonUtility.FromJson<PoseData>(json);
+                    // Deserialize pose data
+                    PoseData poseData = jsonData.ToObject<PoseData>();
 
-                    // Update pose landmarks
                     lock (landmarks)
                     {
                         landmarks = poseData.landmarks;
@@ -86,22 +90,37 @@ public class UPD_Communication : MonoBehaviour
 
                     Debug.Log("Received pose data.");
                 }
-                else if (receivedData.type == "hand")
+                else if (type == "hand")
                 {
-                    // Deserialize as HandData
-                    HandData handData = JsonUtility.FromJson<HandData>(json);
+                    // Deserialize hand data
+                    HandData handData = jsonData.ToObject<HandData>();
 
-                    // Update hand landmarks
-                    lock (handLandmarks)
+                    if (handData.handedness == "Right")
                     {
-                        handLandmarks = handData.hand_landmarks;
-                    }
+                        lock (rightHandLandmarks)
+                        {
+                            rightHandLandmarks = handData.hand_landmarks;
+                        }
 
-                    Debug.Log("Received hand data.");
+                        Debug.Log("Received Right hand data.");
+                    }
+                    else if (handData.handedness == "Left")
+                    {
+                        lock (leftHandLandmarks)
+                        {
+                            leftHandLandmarks = handData.hand_landmarks;
+                        }
+
+                        Debug.Log("Received Left hand data.");
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Unknown handedness: " + handData.handedness);
+                    }
                 }
                 else
                 {
-                    Debug.LogWarning("Unknown data type received: " + receivedData.type);
+                    Debug.LogWarning("Unknown data type received: " + type);
                 }
             }
             catch (System.Exception ex)
@@ -112,7 +131,8 @@ public class UPD_Communication : MonoBehaviour
     }
 
 
-    void StopReceiver()
+
+        void StopReceiver()
     {
         isRunning = false;
         if (udpClient != null)
@@ -142,8 +162,8 @@ public class UPD_Communication : MonoBehaviour
                 RotateRightArm(rightArmObject.transform);
                 RotateLeftForearm(leftForearmObject.transform);
                 RotateRightForearm(rightForearmObject.transform);
-                RotateLeftWrist(leftWristObject.transform);
-                RotateRightWrist(rightWristObject.transform);
+                //RotateLeftWrist(leftWristObject.transform);
+                //RotateRightWrist(rightWristObject.transform);
                 RotateWaist(waistObject.transform);
                 RotateChest(chestObject.transform);
                 RotateHip(hipObject.transform);
@@ -151,6 +171,24 @@ public class UPD_Communication : MonoBehaviour
                 RotateRightUpLeg(rightUpLeg.transform);
                 RotateLeftLowerLeg(leftLowLegObject.transform);
                 RotateRightLowerLeg(rightLowLegObject.transform);
+            }
+        }
+
+        lock (leftHandLandmarks)
+        {
+            if (leftHandLandmarks.Count > 0)
+            {
+                RotateLeftWrist(leftWristObject.transform);
+                // Optionally update other left hand joints
+            }
+        }
+
+        lock (rightHandLandmarks)
+        {
+            if (rightHandLandmarks.Count > 0)
+            {
+                RotateRightWrist(rightWristObject.transform);
+                // Optionally update other right hand joints
             }
         }
     }
@@ -364,79 +402,117 @@ public class UPD_Communication : MonoBehaviour
 
     void RotateLeftWrist(Transform wristTransform)
     {
-        if (wristTransform == null || landmarks.Count < 21) return;
+        if (wristTransform == null || leftHandLandmarks.Count < 21) return;
 
-        // Get landmarks for wrist (point 15) and index finger tip (point 19)
-        Landmark wrist = landmarks[15];
-        Landmark indexFingerTip = landmarks[19];
+        // Get landmarks for wrist and finger bases (MCP joints)
+        HandLandmark wrist = leftHandLandmarks[0];
+        HandLandmark indexMCP = leftHandLandmarks[5];
+        HandLandmark pinkyMCP = leftHandLandmarks[17];
 
-        // Create a vector from wrist to index finger tip
+        // Create vectors from wrist to finger bases
         Vector3 wristToIndex = new Vector3(
-            indexFingerTip.x - wrist.x,
-            indexFingerTip.y - wrist.y,
-            indexFingerTip.z - wrist.z
-        ).normalized;
+            indexMCP.x - wrist.x,
+            indexMCP.y - wrist.y,
+            indexMCP.z - wrist.z
+        );
 
-        // Use an up vector from the elbow to the wrist for a better reference
-        Landmark elbow = landmarks[13]; // Left elbow landmark
-        //if (elbow.visibility < 0.5f) return;
-        Vector3 elbowToWrist = new Vector3(
-            wrist.x - elbow.x,
-            wrist.y - elbow.y,
-            wrist.z - elbow.z
-        ).normalized;
+        Vector3 wristToPinky = new Vector3(
+            pinkyMCP.x - wrist.x,
+            pinkyMCP.y - wrist.y,
+            pinkyMCP.z - wrist.z
+        );
 
-        // Calculate the target rotation based on the direction from wrist to index finger tip
-        Quaternion targetRotation = Quaternion.LookRotation(wristToIndex, elbowToWrist);
+        // Compute the normal vector of the palm
+        Vector3 palmNormal = Vector3.Cross(wristToPinky, wristToIndex).normalized;
 
-        // Adjust the rotation to account for the initial T-pose offset
-        Quaternion tPoseCorrection = Quaternion.Euler(-90f, 0f, 0f);
+        // Adjust coordinates to match Unity's coordinate system
+        Vector3 adjustedPalmNormal = AdjustCoordinates(palmNormal);
+        Vector3 adjustedWristToIndex = AdjustCoordinates(wristToIndex.normalized);
+
+        // Invert the palm normal vector
+        adjustedPalmNormal = -adjustedPalmNormal;
+
+        // Calculate the target rotation
+        Quaternion targetRotation = Quaternion.LookRotation(adjustedWristToIndex, adjustedPalmNormal);
+
+        // Apply any necessary corrections based on your model's orientation
+        Quaternion tPoseCorrection = Quaternion.Euler(90f, 0f, 0f); // Adjust as needed
         targetRotation = targetRotation * tPoseCorrection;
+
+        // Flip the hand by 180 degrees around the Y-axis
+        Quaternion flipCorrection = Quaternion.Euler(0f, 180f, 0f);  // 180 degrees around Y-axis (or Z-axis)
+        targetRotation = targetRotation * flipCorrection;
 
         // Smoothly interpolate the current rotation to the target rotation
         wristTransform.rotation = Quaternion.Slerp(
             wristTransform.rotation, targetRotation, Time.deltaTime * smoth
         );
     }
-
 
 
     void RotateRightWrist(Transform wristTransform)
     {
-        if (wristTransform == null || landmarks.Count < 21) return;
+        if (wristTransform == null || rightHandLandmarks.Count < 21) return;
 
-        // Get landmarks for wrist (point 16) and index finger tip (point 20)
-        Landmark wrist = landmarks[16];
-        Landmark indexFingerTip = landmarks[20];
+        // Get landmarks for wrist and finger bases (MCP joints)
+        HandLandmark wrist = rightHandLandmarks[0];
+        HandLandmark indexMCP = rightHandLandmarks[5];
+        HandLandmark pinkyMCP = rightHandLandmarks[17];
 
-        // Create a vector from wrist to index finger tip
+        // Create vectors from wrist to finger bases
         Vector3 wristToIndex = new Vector3(
-            indexFingerTip.x - wrist.x,
-            indexFingerTip.y - wrist.y,
-            indexFingerTip.z - wrist.z
-        ).normalized;
+            indexMCP.x - wrist.x,
+            indexMCP.y - wrist.y,
+            indexMCP.z - wrist.z
+        );
 
-        // Use an up vector from the elbow to the wrist for a better reference
-        Landmark elbow = landmarks[14]; // Right elbow landmark
-        //if (elbow.visibility < 0.5f) return;
-        Vector3 elbowToWrist = new Vector3(
-            wrist.x - elbow.x,
-            wrist.y - elbow.y,
-            wrist.z - elbow.z
-        ).normalized;
+        Vector3 wristToPinky = new Vector3(
+            pinkyMCP.x - wrist.x,
+            pinkyMCP.y - wrist.y,
+            pinkyMCP.z - wrist.z
+        );
 
-        // Calculate the target rotation based on the direction from wrist to index finger tip
-        Quaternion targetRotation = Quaternion.LookRotation(wristToIndex, elbowToWrist);
+        // Compute the normal vector of the palm
+        Vector3 palmNormal = Vector3.Cross(wristToIndex, wristToPinky).normalized;
 
-        // Adjust the rotation to account for the initial T-pose offset
-        Quaternion tPoseCorrection = Quaternion.Euler(-90f, 0f, 0f);
+        // Adjust coordinates to match Unity's coordinate system
+        Vector3 adjustedPalmNormal = AdjustCoordinates(palmNormal);
+        Vector3 adjustedWristToIndex = AdjustCoordinates(wristToIndex.normalized);
+
+        // Invert the palm normal vector
+        adjustedPalmNormal = -adjustedPalmNormal;
+
+        // Calculate the target rotation
+        Quaternion targetRotation = Quaternion.LookRotation(adjustedWristToIndex, adjustedPalmNormal);
+
+        // Apply any necessary corrections based on your model's orientation
+        Quaternion tPoseCorrection = Quaternion.Euler(90f, 0f, 0f); // Adjust as needed
         targetRotation = targetRotation * tPoseCorrection;
+
+        // Flip the hand by 180 degrees around the Y-axis
+        Quaternion flipCorrection = Quaternion.Euler(0f, 180f, 0f);  // 180 degrees around Y-axis (or Z-axis)
+        targetRotation = targetRotation * flipCorrection;
 
         // Smoothly interpolate the current rotation to the target rotation
         wristTransform.rotation = Quaternion.Slerp(
             wristTransform.rotation, targetRotation, Time.deltaTime * smoth
         );
     }
+
+
+
+
+    Vector3 AdjustCoordinates(Vector3 original)
+    {
+        // Adjust the coordinates to match Unity's coordinate system
+        // Depending on your setup, you may need to invert certain axes
+        return new Vector3(
+            original.x * scale,
+            -original.y * scale,
+            -original.z * scale
+        );
+    }
+
 
     void RotateChest(Transform chestTransform)
     {
@@ -764,12 +840,15 @@ public class UPD_Communication : MonoBehaviour
     [System.Serializable]
     public class PoseData
     {
+        public string type;
         public List<Landmark> landmarks;
     }
 
     [System.Serializable]
-    public class HandData : ReceivedData
+    public class HandData
     {
+        public string type;
+        public string handedness;
         public List<HandLandmark> hand_landmarks;
     }
 
