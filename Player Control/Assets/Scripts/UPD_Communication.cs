@@ -13,6 +13,7 @@ public class UPD_Communication : MonoBehaviour
     private bool isRunning = false;
 
     public List<Landmark> landmarks = new List<Landmark>();
+    public List<HandLandmark> handLandmarks = new List<HandLandmark>();
 
     public GameObject root;
     public GameObject noseObject;
@@ -69,16 +70,39 @@ public class UPD_Communication : MonoBehaviour
                 byte[] data = udpClient.Receive(ref remoteEndPoint);
                 string json = Encoding.UTF8.GetString(data);
 
-                // Deserialize the JSON data
-                PoseData poseData = JsonUtility.FromJson<PoseData>(json);
+                // Deserialize the JSON data to determine the type
+                ReceivedData receivedData = JsonUtility.FromJson<ReceivedData>(json);
 
-                // Update landmarks
-                lock (landmarks)
+                if (receivedData.type == "pose")
                 {
-                    landmarks = poseData.landmarks;
-                }
+                    // Deserialize as PoseData
+                    PoseData poseData = JsonUtility.FromJson<PoseData>(json);
 
-                Debug.Log("Received pose data.");
+                    // Update pose landmarks
+                    lock (landmarks)
+                    {
+                        landmarks = poseData.landmarks;
+                    }
+
+                    Debug.Log("Received pose data.");
+                }
+                else if (receivedData.type == "hand")
+                {
+                    // Deserialize as HandData
+                    HandData handData = JsonUtility.FromJson<HandData>(json);
+
+                    // Update hand landmarks
+                    lock (handLandmarks)
+                    {
+                        handLandmarks = handData.hand_landmarks;
+                    }
+
+                    Debug.Log("Received hand data.");
+                }
+                else
+                {
+                    Debug.LogWarning("Unknown data type received: " + receivedData.type);
+                }
             }
             catch (System.Exception ex)
             {
@@ -86,6 +110,7 @@ public class UPD_Communication : MonoBehaviour
             }
         }
     }
+
 
     void StopReceiver()
     {
@@ -656,30 +681,36 @@ public class UPD_Communication : MonoBehaviour
 
     void RotateLeftLowerLeg(Transform lowerLegTransform)
     {
-        if (lowerLegTransform == null || landmarks.Count < 29) return;
+        if (lowerLegTransform == null || landmarks.Count < 33) return;
 
-        // Get landmarks for the left knee (point 25) and left ankle (point 27)
+        // Get landmarks for the left hip (point 23), left knee (point 25), left ankle (point 27), and left foot index (point 31)
+        Landmark leftHip = landmarks[23];
         Landmark leftKnee = landmarks[25];
         Landmark leftAnkle = landmarks[27];
+        Landmark leftFootIndex = landmarks[31];
 
-        // Create a vector for knee to ankle
-        Vector3 kneeToAnkle = new Vector3(
-            leftAnkle.x - leftKnee.x,
-            leftAnkle.y - leftKnee.y,
-            leftAnkle.z - leftKnee.z
-        );
+        // Convert landmark positions to Vector3
+        Vector3 hipPos = new Vector3(leftHip.x, leftHip.y, leftHip.z);
+        Vector3 kneePos = new Vector3(leftKnee.x, leftKnee.y, leftKnee.z);
+        Vector3 anklePos = new Vector3(leftAnkle.x, leftAnkle.y, leftAnkle.z);
+        Vector3 footIndexPos = new Vector3(leftFootIndex.x, leftFootIndex.y, leftFootIndex.z);
 
-        // Normalize the vector to ensure it only represents direction
-        kneeToAnkle.Normalize();
+        // Calculate the direction vectors
+        Vector3 kneeToAnkle = anklePos - kneePos;
+        Vector3 ankleToFootIndex = footIndexPos - anklePos;
 
-        // Calculate a reference up vector for the lower leg
-        Vector3 referenceUp = Vector3.up; // You can customize this based on the model's orientation.
+        // Calculate the normal of the plane formed by the hip, knee, and ankle
+        Vector3 legPlaneNormal = Vector3.Cross(kneePos - hipPos, anklePos - kneePos);
+        legPlaneNormal.Normalize();
 
-        // Calculate the target rotation based on the knee-to-ankle direction and the up vector
+        // Use the leg plane normal as the up vector
+        Vector3 referenceUp = legPlaneNormal;
+
+        // Calculate the target rotation
         Quaternion targetRotation = Quaternion.LookRotation(kneeToAnkle, referenceUp);
 
         // Adjust the rotation to account for the initial T-pose offset
-        Quaternion tPoseCorrection = Quaternion.Euler(40f, 0f, 180f); // Modify as necessary for alignment
+        Quaternion tPoseCorrection = Quaternion.Euler(0f, 60f, -90f); // Modify as necessary for alignment
         targetRotation = targetRotation * tPoseCorrection;
 
         // Smoothly interpolate the current rotation to the target rotation
@@ -688,43 +719,58 @@ public class UPD_Communication : MonoBehaviour
 
     void RotateRightLowerLeg(Transform lowerLegTransform)
     {
-        if (lowerLegTransform == null || landmarks.Count < 29) return;
+        if (lowerLegTransform == null || landmarks.Count < 33) return;
 
-        // Get landmarks for the right knee (point 26) and right ankle (point 28)
+        // Get landmarks for the right hip (point 24), right knee (point 26), right ankle (point 28), and right foot index (point 32)
+        Landmark rightHip = landmarks[24];
         Landmark rightKnee = landmarks[26];
         Landmark rightAnkle = landmarks[28];
+        Landmark rightFootIndex = landmarks[32];
 
-        // Create a vector for knee to ankle
-        Vector3 kneeToAnkle = new Vector3(
-            rightAnkle.x - rightKnee.x,
-            rightAnkle.y - rightKnee.y,
-            rightAnkle.z - rightKnee.z
-        );
+        // Convert landmark positions to Vector3
+        Vector3 hipPos = new Vector3(rightHip.x, rightHip.y, rightHip.z);
+        Vector3 kneePos = new Vector3(rightKnee.x, rightKnee.y, rightKnee.z);
+        Vector3 anklePos = new Vector3(rightAnkle.x, rightAnkle.y, rightAnkle.z);
+        Vector3 footIndexPos = new Vector3(rightFootIndex.x, rightFootIndex.y, rightFootIndex.z);
 
-        // Normalize the vector to ensure it only represents direction
-        kneeToAnkle.Normalize();
+        // Calculate the direction vectors
+        Vector3 kneeToAnkle = anklePos - kneePos;
+        Vector3 ankleToFootIndex = footIndexPos - anklePos;
 
-        // Calculate a reference up vector for the lower leg
-        Vector3 referenceUp = Vector3.up; // You can customize this based on the model's orientation.
+        // Calculate the normal of the plane formed by the hip, knee, and ankle
+        Vector3 legPlaneNormal = Vector3.Cross(kneePos - hipPos, anklePos - kneePos);
+        legPlaneNormal.Normalize();
 
-        // Calculate the target rotation based on the knee-to-ankle direction and the up vector
+        // Use the leg plane normal as the up vector
+        Vector3 referenceUp = legPlaneNormal;
+
+        // Calculate the target rotation
         Quaternion targetRotation = Quaternion.LookRotation(kneeToAnkle, referenceUp);
 
         // Adjust the rotation to account for the initial T-pose offset
-        Quaternion tPoseCorrection = Quaternion.Euler(40f, 0f, 180f); // Modify as necessary for alignment
+        Quaternion tPoseCorrection = Quaternion.Euler(0f, 60f, -90f); // Modify as necessary for alignment
         targetRotation = targetRotation * tPoseCorrection;
 
         // Smoothly interpolate the current rotation to the target rotation
         lowerLegTransform.rotation = Quaternion.Slerp(lowerLegTransform.rotation, targetRotation, Time.deltaTime * smoth);
     }
 
-
-
+    [System.Serializable]
+    public class ReceivedData
+    {
+        public string type;
+    }
 
     [System.Serializable]
     public class PoseData
     {
         public List<Landmark> landmarks;
+    }
+
+    [System.Serializable]
+    public class HandData : ReceivedData
+    {
+        public List<HandLandmark> hand_landmarks;
     }
 
     [System.Serializable]
@@ -734,5 +780,13 @@ public class UPD_Communication : MonoBehaviour
         public float y;
         public float z;
         public float visibility;
+    }
+
+    [System.Serializable]
+    public class HandLandmark
+    {
+        public float x;
+        public float y;
+        public float z;
     }
 }
