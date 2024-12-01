@@ -130,9 +130,14 @@ public class UPD_Communication : MonoBehaviour
         }
     }
 
+    // Declare variables to store initial positions
+    private Vector3 initialHipMidpointNormalized;
+    private Vector3 initialRootPosition;
+    private bool initialPositionSet = false;
+
     void MoveModelRootBasedOnHip(Transform rootTransform)
     {
-        if (rootTransform == null || landmarks.Count < 23) return;
+        if (rootTransform == null || landmarks.Count < 25) return; // Ensure landmarks are available
 
         // Get landmarks for the left and right hips (points 23 and 24 in MediaPipe Pose)
         Landmark leftHip = landmarks[23];
@@ -145,18 +150,35 @@ public class UPD_Communication : MonoBehaviour
             (leftHip.z + rightHip.z) / 2.0f
         );
 
-        // Assuming you want to convert this to world space, scale by some factor
-        // For example, if normalized values range from 0 to 1, you can use a scale factor for world space:
-        float scaleFactor = 2f; // Adjust this depending on your world coordinates range
-        Vector3 worldHipMidpoint = new Vector3(
-            hipMidpointNormalized.x * scaleFactor * -1,
-            hipMidpointNormalized.y * scaleFactor * -1,
-            hipMidpointNormalized.z * scaleFactor * -1
+        // If initial position is not set, store the initial hip midpoint and root position
+        if (!initialPositionSet)
+        {
+            initialHipMidpointNormalized = hipMidpointNormalized;
+            initialRootPosition = rootTransform.position;
+            initialPositionSet = true;
+        }
+
+        // Compute the offset from the initial hip midpoint
+        Vector3 hipOffset = hipMidpointNormalized - initialHipMidpointNormalized;
+
+        // Ignore vertical movement by setting the y-component to zero
+        hipOffset.y = 0f;
+
+        // Apply scale factor if needed
+        float scaleFactor = 2f; // Adjust as necessary
+        Vector3 worldHipOffset = new Vector3(
+            hipOffset.x * scaleFactor * -1,
+            0f, // Ensure y-component remains zero
+            hipOffset.z * scaleFactor * -1
         );
 
-        // Apply the calculated world position to the root transform
-        rootTransform.position = Vector3.Lerp(rootTransform.position, worldHipMidpoint, Time.deltaTime * 5f);  // Smooth movement
+        // Apply the offset to the initial root position
+        Vector3 targetPosition = initialRootPosition + worldHipOffset;
+
+        // Smoothly move the root transform to the new position
+        rootTransform.position = Vector3.Lerp(rootTransform.position, targetPosition, Time.deltaTime * 5f);
     }
+
 
 
 
