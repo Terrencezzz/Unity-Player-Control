@@ -18,6 +18,20 @@ public class UPD_Communication : MonoBehaviour
     public List<HandLandmark> leftHandLandmarks = new List<HandLandmark>();
     public List<HandLandmark> rightHandLandmarks = new List<HandLandmark>();
 
+    //Body Object not in animator
+    public GameObject thumbTipL;
+    public GameObject indexFingerTipL;
+    public GameObject middleFingerTipL;
+    public GameObject ringFingerTipL;
+    public GameObject pinkyFingerTipL;
+
+    public GameObject thumbTipR;
+    public GameObject indexFingerTipR;
+    public GameObject middleFingerTipR;
+    public GameObject ringFingerTipR;
+    public GameObject pinkyFingerTipR;
+
+    //Body
     public GameObject root;
     public GameObject noseObject;
     public GameObject leftArmObject;
@@ -35,6 +49,51 @@ public class UPD_Communication : MonoBehaviour
     public GameObject leftLowLegObject;
     public GameObject rightLowLegObject;
 
+    // Left Hand Transforms
+    private Transform ThumbCMCL;
+    private Transform ThumbMCPL;
+    private Transform ThumbIPL;
+    private Transform ThumbTipL;
+    private Transform IndexFingerMCPL;
+    private Transform IndexFingerPIPL;
+    private Transform IndexFingerDIPL;
+    private Transform IndexFingerTipL;
+    private Transform MiddleFingerMCPL;
+    private Transform MiddleFingerPIPL;
+    private Transform MiddleFingerDIPL;
+    private Transform MiddleFingerTipL;
+    private Transform RingFingerMCPL;
+    private Transform RingFingerPIPL;
+    private Transform RingFingerDIPL;
+    private Transform RingFingerTipL;
+    private Transform PinkyFingerMCPL;
+    private Transform PinkyFingerPIPL;
+    private Transform PinkyFingerDIPL;
+    private Transform PinkyFingerTipL;
+
+    // Right Hand Transforms
+    private Transform ThumbCMCR;
+    private Transform ThumbMCPR;
+    private Transform ThumbIPR;
+    private Transform ThumbTipR;
+    private Transform IndexFingerMCPR;
+    private Transform IndexFingerPIPR;
+    private Transform IndexFingerDIPR;
+    private Transform IndexFingerTipR;
+    private Transform MiddleFingerMCPR;
+    private Transform MiddleFingerPIPR;
+    private Transform MiddleFingerDIPR;
+    private Transform MiddleFingerTipR;
+    private Transform RingFingerMCPR;
+    private Transform RingFingerPIPR;
+    private Transform RingFingerDIPR;
+    private Transform RingFingerTipR;
+    private Transform PinkyFingerMCPR;
+    private Transform PinkyFingerPIPR;
+    private Transform PinkyFingerDIPR;
+    private Transform PinkyFingerTipR;
+
+
     private int scale = 10;
     private float smoth = 5f;
     Animator animator;
@@ -44,6 +103,56 @@ public class UPD_Communication : MonoBehaviour
     void Start()
     {
         animator = this.GetComponent<Animator>();
+        ThumbCMCL = animator.GetBoneTransform(HumanBodyBones.LeftThumbProximal);
+        ThumbMCPL = animator.GetBoneTransform(HumanBodyBones.LeftThumbIntermediate);
+        ThumbIPL = animator.GetBoneTransform(HumanBodyBones.LeftThumbDistal);
+        ThumbTipL = thumbTipL.transform;
+
+        IndexFingerMCPL = animator.GetBoneTransform(HumanBodyBones.LeftIndexProximal);
+        IndexFingerPIPL = animator.GetBoneTransform(HumanBodyBones.LeftIndexIntermediate);
+        IndexFingerDIPL = animator.GetBoneTransform(HumanBodyBones.LeftIndexDistal);
+        IndexFingerTipL = indexFingerTipL.transform;
+
+        MiddleFingerMCPL = animator.GetBoneTransform(HumanBodyBones.LeftMiddleProximal);
+        MiddleFingerPIPL = animator.GetBoneTransform(HumanBodyBones.LeftMiddleIntermediate);
+        MiddleFingerDIPL = animator.GetBoneTransform(HumanBodyBones.LeftMiddleDistal);
+        MiddleFingerTipL = middleFingerTipL.transform;
+
+        RingFingerMCPL = animator.GetBoneTransform(HumanBodyBones.LeftRingProximal);
+        RingFingerPIPL = animator.GetBoneTransform(HumanBodyBones.LeftRingIntermediate);
+        RingFingerDIPL = animator.GetBoneTransform(HumanBodyBones.LeftRingDistal);
+        RingFingerTipL = ringFingerTipL.transform;
+
+        PinkyFingerMCPL = animator.GetBoneTransform(HumanBodyBones.LeftLittleProximal);
+        PinkyFingerPIPL = animator.GetBoneTransform(HumanBodyBones.LeftLittleIntermediate);
+        PinkyFingerDIPL = animator.GetBoneTransform(HumanBodyBones.LeftLittleDistal);
+        PinkyFingerTipL = pinkyFingerTipL.transform;
+
+        ThumbCMCR = animator.GetBoneTransform(HumanBodyBones.RightThumbProximal);
+        ThumbMCPR = animator.GetBoneTransform(HumanBodyBones.RightThumbIntermediate);
+        ThumbIPR = animator.GetBoneTransform(HumanBodyBones.RightThumbDistal);
+        ThumbTipR = thumbTipR.transform;
+
+        IndexFingerMCPR = animator.GetBoneTransform(HumanBodyBones.RightIndexProximal);
+        IndexFingerPIPR = animator.GetBoneTransform(HumanBodyBones.RightIndexIntermediate);
+        IndexFingerDIPR = animator.GetBoneTransform(HumanBodyBones.RightIndexDistal);
+        IndexFingerTipL = indexFingerTipR.transform;
+
+        MiddleFingerMCPR = animator.GetBoneTransform(HumanBodyBones.RightMiddleProximal);
+        MiddleFingerPIPR = animator.GetBoneTransform(HumanBodyBones.RightMiddleIntermediate);
+        MiddleFingerDIPR = animator.GetBoneTransform(HumanBodyBones.RightMiddleDistal);
+        MiddleFingerTipR = middleFingerTipR.transform;
+
+        RingFingerMCPR = animator.GetBoneTransform(HumanBodyBones.RightRingProximal);
+        RingFingerPIPR = animator.GetBoneTransform(HumanBodyBones.RightRingIntermediate);
+        RingFingerDIPR = animator.GetBoneTransform(HumanBodyBones.RightRingDistal);
+        RingFingerTipR = ringFingerTipR.transform;
+
+        PinkyFingerMCPR = animator.GetBoneTransform(HumanBodyBones.RightLittleProximal);
+        PinkyFingerPIPR = animator.GetBoneTransform(HumanBodyBones.RightLittleIntermediate);
+        PinkyFingerDIPR = animator.GetBoneTransform(HumanBodyBones.RightLittleDistal);
+        PinkyFingerTipR = pinkyFingerTipR.transform;
+
         StartReceiver();
     }
 
@@ -97,18 +206,18 @@ public class UPD_Communication : MonoBehaviour
 
                     if (handData.handedness == "Right")
                     {
-                        lock (rightHandLandmarks)
+                        lock (leftHandLandmarks)
                         {
-                            rightHandLandmarks = handData.hand_landmarks;
+                            leftHandLandmarks = handData.hand_landmarks;
                         }
 
                         Debug.Log("Received Right hand data.");
                     }
                     else if (handData.handedness == "Left")
                     {
-                        lock (leftHandLandmarks)
+                        lock (rightHandLandmarks)
                         {
-                            leftHandLandmarks = handData.hand_landmarks;
+                            rightHandLandmarks = handData.hand_landmarks;
                         }
 
                         Debug.Log("Received Left hand data.");
@@ -162,8 +271,6 @@ public class UPD_Communication : MonoBehaviour
                 RotateRightArm(rightArmObject.transform);
                 RotateLeftForearm(leftForearmObject.transform);
                 RotateRightForearm(rightForearmObject.transform);
-                //RotateLeftWrist(leftWristObject.transform);
-                //RotateRightWrist(rightWristObject.transform);
                 RotateWaist(waistObject.transform);
                 RotateChest(chestObject.transform);
                 RotateHip(hipObject.transform);
@@ -179,7 +286,7 @@ public class UPD_Communication : MonoBehaviour
             if (leftHandLandmarks.Count > 0)
             {
                 RotateLeftWrist(leftWristObject.transform);
-                // Optionally update other left hand joints
+                LeftFingersControl();
             }
         }
 
@@ -188,7 +295,7 @@ public class UPD_Communication : MonoBehaviour
             if (rightHandLandmarks.Count > 0)
             {
                 RotateRightWrist(rightWristObject.transform);
-                // Optionally update other right hand joints
+                RightFingersControl();
             }
         }
     }
@@ -241,9 +348,6 @@ public class UPD_Communication : MonoBehaviour
         // Smoothly move the root transform to the new position
         rootTransform.position = Vector3.Lerp(rootTransform.position, targetPosition, Time.deltaTime * 5f);
     }
-
-
-
 
     void RotateHead(Transform headTransform)
     {
@@ -400,6 +504,241 @@ public class UPD_Communication : MonoBehaviour
         forearmTransform.rotation = Quaternion.Slerp(forearmTransform.rotation, targetRotation, Time.deltaTime * smoth);
     }
 
+    void LeftFingersControl()
+    {
+        if (leftHandLandmarks.Count < 21) return;
+
+        int currentIndex = 1;
+        int nextIndex = 2;
+
+        float scaleFactor = 360f;
+
+        HandLandmark currentPoint;
+        HandLandmark nextPoint;
+
+        for (int i = 0; i < leftHandLandmarks.Count - nextIndex; i++)
+        {
+            if (i == 3 || i == 7 || i == 11 || i == 15) continue;
+
+            currentPoint = leftHandLandmarks[currentIndex + i];
+            nextPoint = leftHandLandmarks[nextIndex + i];
+
+            Vector3 currentPos = new Vector3(
+                currentPoint.x * scaleFactor,
+                currentPoint.y * scaleFactor,
+                currentPoint.z * scaleFactor
+            );
+
+            Vector3 nextPos = new Vector3(
+                nextPoint.x * scaleFactor,
+                nextPoint.y * scaleFactor,
+                nextPoint.z * scaleFactor
+            );
+
+            Vector3 currentToNext = nextPos - currentPos;
+            currentToNext.Normalize();
+
+            Quaternion targetRotation = Quaternion.LookRotation(currentToNext, Vector3.up);
+
+            Quaternion tPoseCorrection = Quaternion.Euler(270f, 0f, 0f);
+            targetRotation = targetRotation * tPoseCorrection;
+
+            switch (i)
+            {
+                // Thumb Joints
+                case 0:
+                    ThumbCMCL.rotation = Quaternion.Slerp(
+                        ThumbCMCL.rotation, targetRotation, Time.deltaTime * smoth);
+                    break;
+                case 1:
+                    ThumbMCPL.rotation = Quaternion.Slerp(
+                        ThumbMCPL.rotation, targetRotation, Time.deltaTime * smoth);
+                    break;
+                case 2:
+                    ThumbIPL.rotation = Quaternion.Slerp(
+                        ThumbIPL.rotation, targetRotation, Time.deltaTime * smoth);
+                    break;
+
+                // Index Finger Joints
+                case 4:
+                    IndexFingerMCPL.rotation = Quaternion.Slerp(
+                        IndexFingerMCPL.rotation, targetRotation, Time.deltaTime * smoth);
+                    break;
+                case 5:
+                    IndexFingerPIPL.rotation = Quaternion.Slerp(
+                        IndexFingerPIPL.rotation, targetRotation, Time.deltaTime * smoth);
+                    break;
+                case 6:
+                    IndexFingerDIPL.rotation = Quaternion.Slerp(
+                        IndexFingerDIPL.rotation, targetRotation, Time.deltaTime * smoth);
+                    break;
+
+                // Middle Finger Joints
+                case 8:
+                    MiddleFingerMCPL.rotation = Quaternion.Slerp(
+                        MiddleFingerMCPL.rotation, targetRotation, Time.deltaTime * smoth);
+                    break;
+                case 9:
+                    MiddleFingerPIPL.rotation = Quaternion.Slerp(
+                        MiddleFingerPIPL.rotation, targetRotation, Time.deltaTime * smoth);
+                    break;
+                case 10:
+                    MiddleFingerDIPL.rotation = Quaternion.Slerp(
+                        MiddleFingerDIPL.rotation, targetRotation, Time.deltaTime * smoth);
+                    break;
+
+                // Ring Finger Joints
+                case 12:
+                    RingFingerMCPL.rotation = Quaternion.Slerp(
+                        RingFingerMCPL.rotation, targetRotation, Time.deltaTime * smoth);
+                    break;
+                case 13:
+                    RingFingerPIPL.rotation = Quaternion.Slerp(
+                        RingFingerPIPL.rotation, targetRotation, Time.deltaTime * smoth);
+                    break;
+                case 14:
+                    RingFingerDIPL.rotation = Quaternion.Slerp(
+                        RingFingerDIPL.rotation, targetRotation, Time.deltaTime * smoth);
+                    break;
+
+                // Pinky Finger Joints
+                case 16:
+                    PinkyFingerMCPL.rotation = Quaternion.Slerp(
+                        PinkyFingerMCPL.rotation, targetRotation, Time.deltaTime * smoth);
+                    break;
+                case 17:
+                    PinkyFingerPIPL.rotation = Quaternion.Slerp(
+                        PinkyFingerPIPL.rotation, targetRotation, Time.deltaTime * smoth);
+                    break;
+                case 18:
+                    PinkyFingerDIPL.rotation = Quaternion.Slerp(
+                        PinkyFingerDIPL.rotation, targetRotation, Time.deltaTime * smoth);
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    }
+
+    void RightFingersControl()
+    {
+        if (rightHandLandmarks.Count < 21) return;
+
+        int currentIndex = 1;
+        int nextIndex = 2;
+
+        float scaleFactor = 360f;
+
+        HandLandmark currentPoint;
+        HandLandmark nextPoint;
+
+        for (int i = 0; i < rightHandLandmarks.Count - nextIndex; i++)
+        {
+            if (i == 3 || i == 7 || i == 11 || i == 15) continue;
+
+            currentPoint = rightHandLandmarks[currentIndex + i];
+            nextPoint = rightHandLandmarks[nextIndex + i];
+
+            Vector3 currentPos = new Vector3(
+                currentPoint.x * scaleFactor,
+                currentPoint.y * scaleFactor,
+                currentPoint.z * scaleFactor
+            );
+
+            Vector3 nextPos = new Vector3(
+                nextPoint.x * scaleFactor,
+                nextPoint.y * scaleFactor,
+                nextPoint.z * scaleFactor
+            );
+
+            Vector3 currentToNext = nextPos - currentPos;
+            currentToNext.Normalize();
+
+            Quaternion targetRotation = Quaternion.LookRotation(currentToNext, Vector3.up);
+
+            Quaternion tPoseCorrection = Quaternion.Euler(270f, 0f, 0f);
+            targetRotation = targetRotation * tPoseCorrection;
+
+            switch (i)
+            {
+                // Thumb Joints
+                case 0:
+                    ThumbCMCR.rotation = Quaternion.Slerp(
+                        ThumbCMCR.rotation, targetRotation, Time.deltaTime * smoth);
+                    break;
+                case 1:
+                    ThumbMCPR.rotation = Quaternion.Slerp(
+                        ThumbMCPR.rotation, targetRotation, Time.deltaTime * smoth);
+                    break;
+                case 2:
+                    ThumbIPR.rotation = Quaternion.Slerp(
+                        ThumbIPR.rotation, targetRotation, Time.deltaTime * smoth);
+                    break;
+
+                // Index Finger Joints
+                case 4:
+                    IndexFingerMCPR.rotation = Quaternion.Slerp(
+                        IndexFingerMCPR.rotation, targetRotation, Time.deltaTime * smoth);
+                    break;
+                case 5:
+                    IndexFingerPIPR.rotation = Quaternion.Slerp(
+                        IndexFingerPIPR.rotation, targetRotation, Time.deltaTime * smoth);
+                    break;
+                case 6:
+                    IndexFingerDIPR.rotation = Quaternion.Slerp(
+                        IndexFingerDIPR.rotation, targetRotation, Time.deltaTime * smoth);
+                    break;
+
+                // Middle Finger Joints
+                case 8:
+                    MiddleFingerMCPR.rotation = Quaternion.Slerp(
+                        MiddleFingerMCPR.rotation, targetRotation, Time.deltaTime * smoth);
+                    break;
+                case 9:
+                    MiddleFingerPIPR.rotation = Quaternion.Slerp(
+                        MiddleFingerPIPR.rotation, targetRotation, Time.deltaTime * smoth);
+                    break;
+                case 10:
+                    MiddleFingerDIPR.rotation = Quaternion.Slerp(
+                        MiddleFingerDIPR.rotation, targetRotation, Time.deltaTime * smoth);
+                    break;
+
+                // Ring Finger Joints
+                case 12:
+                    RingFingerMCPR.rotation = Quaternion.Slerp(
+                        RingFingerMCPR.rotation, targetRotation, Time.deltaTime * smoth);
+                    break;
+                case 13:
+                    RingFingerPIPR.rotation = Quaternion.Slerp(
+                        RingFingerPIPR.rotation, targetRotation, Time.deltaTime * smoth);
+                    break;
+                case 14:
+                    RingFingerDIPR.rotation = Quaternion.Slerp(
+                        RingFingerDIPR.rotation, targetRotation, Time.deltaTime * smoth);
+                    break;
+
+                // Pinky Finger Joints
+                case 16:
+                    PinkyFingerMCPR.rotation = Quaternion.Slerp(
+                        PinkyFingerMCPR.rotation, targetRotation, Time.deltaTime * smoth);
+                    break;
+                case 17:
+                    PinkyFingerPIPR.rotation = Quaternion.Slerp(
+                        PinkyFingerPIPR.rotation, targetRotation, Time.deltaTime * smoth);
+                    break;
+                case 18:
+                    PinkyFingerDIPR.rotation = Quaternion.Slerp(
+                        PinkyFingerDIPR.rotation, targetRotation, Time.deltaTime * smoth);
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    }
+
+
     void RotateLeftWrist(Transform wristTransform)
     {
         if (wristTransform == null || leftHandLandmarks.Count < 21) return;
@@ -428,9 +767,6 @@ public class UPD_Communication : MonoBehaviour
         // Adjust coordinates to match Unity's coordinate system
         Vector3 adjustedPalmNormal = AdjustCoordinates(palmNormal);
         Vector3 adjustedWristToIndex = AdjustCoordinates(wristToIndex.normalized);
-
-        // Invert the palm normal vector
-        adjustedPalmNormal = -adjustedPalmNormal;
 
         // Calculate the target rotation
         Quaternion targetRotation = Quaternion.LookRotation(adjustedWristToIndex, adjustedPalmNormal);
@@ -479,9 +815,6 @@ public class UPD_Communication : MonoBehaviour
         Vector3 adjustedPalmNormal = AdjustCoordinates(palmNormal);
         Vector3 adjustedWristToIndex = AdjustCoordinates(wristToIndex.normalized);
 
-        // Invert the palm normal vector
-        adjustedPalmNormal = -adjustedPalmNormal;
-
         // Calculate the target rotation
         Quaternion targetRotation = Quaternion.LookRotation(adjustedWristToIndex, adjustedPalmNormal);
 
@@ -500,14 +833,12 @@ public class UPD_Communication : MonoBehaviour
     }
 
 
-
-
     Vector3 AdjustCoordinates(Vector3 original)
     {
         // Adjust the coordinates to match Unity's coordinate system
         // Depending on your setup, you may need to invert certain axes
         return new Vector3(
-            original.x * scale,
+            -original.x * scale,
             -original.y * scale,
             -original.z * scale
         );
@@ -656,8 +987,6 @@ public class UPD_Communication : MonoBehaviour
             Time.deltaTime * smoth
         );
     }
-
-
 
     void RotateLeftUpLeg(Transform upperLegTransform)
     {
