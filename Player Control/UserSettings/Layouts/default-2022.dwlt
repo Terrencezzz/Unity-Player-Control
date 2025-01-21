@@ -293,7 +293,7 @@ MonoBehaviour:
       scrollPos: {x: 0, y: 0}
       m_SelectedIDs: 
       m_LastClickedID: 0
-      m_ExpandedIDs: f6faffff30fbffff92590000985900009c590000a6590000a8590000c0590000c4590000d2590000da590000dc590000e6590000ea590000
+      m_ExpandedIDs: 30fbffff
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -660,9 +660,9 @@ MonoBehaviour:
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 7.854453, y: -8.456644, z: -21.17079}
+    m_Target: {x: -1.8568873, y: -3.9112372, z: -22.982798}
     speed: 2
-    m_Value: {x: 7.854453, y: -8.456644, z: -21.17079}
+    m_Value: {x: -1.8568873, y: -3.9112372, z: -22.982798}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -708,9 +708,9 @@ MonoBehaviour:
     m_GridAxis: 1
     m_gridOpacity: 0.5
   m_Rotation:
-    m_Target: {x: -0.03240504, y: -0.96924245, z: 0.17597586, w: -0.17186823}
+    m_Target: {x: 0.0020591316, y: -0.9963551, z: 0.08174447, w: 0.040267326}
     speed: 2
-    m_Value: {x: -0.032389056, y: -0.96876436, z: 0.17588906, w: -0.17178346}
+    m_Value: {x: -0.0020591316, y: 0.99635506, z: -0.08174447, w: -0.040267326}
   m_Size:
     m_Target: 12.683916
     speed: 2
@@ -970,9 +970,9 @@ MonoBehaviour:
     m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 505b0000
-    m_LastClickedID: 23376
-    m_ExpandedIDs: 00000000405b000000ca9a3b
+    m_SelectedIDs: 3c5b0000
+    m_LastClickedID: 23356
+    m_ExpandedIDs: 000000002c5b000000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1000,7 +1000,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 94.33328}
     m_SelectedIDs: f69c0000
     m_LastClickedID: 40182
-    m_ExpandedIDs: 00000000405b0000
+    m_ExpandedIDs: 000000002c5b0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1027,7 +1027,7 @@ MonoBehaviour:
   m_ListAreaState:
     m_SelectedInstanceIDs: 
     m_LastClickedInstanceID: 0
-    m_HadKeyboardFocusLastEvent: 1
+    m_HadKeyboardFocusLastEvent: 0
     m_ExpandedInstanceIDs: c6230000fa4ffeff761e0000ec590000a4590000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
