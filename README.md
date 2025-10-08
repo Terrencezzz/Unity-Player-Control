@@ -5,3 +5,5 @@ Remeber to set up the environment before you use the Model.py:
 pip install mediapipe
 pip install opencv-python
 pip install opencv-contrib-python
+
+If you only want to try the body track, there is a package for you inside the "release" section
